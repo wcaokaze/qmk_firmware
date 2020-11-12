@@ -44,8 +44,8 @@
 #define MATRIX_COL_PINS { F4, F5, F6, F7, B1, B3, B2 }
 #define UNUSED_PINS
 
-#define ENCODERS_PAD_A { E6, B5 }
-#define ENCODERS_PAD_B { B4, B6 }
+#define ENCODERS_PAD_A { E6, B6 }
+#define ENCODERS_PAD_B { B4, B5 }
 
 #define DIODE_DIRECTION COL2ROW
 
