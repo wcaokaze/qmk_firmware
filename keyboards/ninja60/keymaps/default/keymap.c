@@ -68,7 +68,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
       _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR , KC_PERC, _______,     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUES, _______,
       _______, _______, _______, _______, _______, _______,              _______, _______, _______, _______, _______, D_ARW  , _______,
-      _______      , _______   , _______    , _______     , _______,     _______, _______    , _______     , _______
+      _______      , _______   , _______    , _______     , _______,     KC_BSPC, _______    , _______     , _______
   ),
 
   [_FN] = LAYOUT(
@@ -114,14 +114,5 @@ void encoder_update_user(uint8_t index, bool clockwise) {
       }
       break;
   }
-}
-
-bool get_tapping_force_hold(uint16_t keycode, keyrecord_t *record) {
-   switch (keycode) {
-      case SYM_SPC:
-         return true;
-      default:
-         return false;
-   }
 }
 
