@@ -101,16 +101,16 @@ void encoder_update_user(uint8_t index, bool clockwise) {
   switch (index) {
     case _1ST:
       if (clockwise) {
-        tap_code(KC_F2);
+        tap_code(KC_M);
       } else {
-        tap_code(KC_F4);
+        tap_code(KC_B);
       }
       break;
     case _2ND:
       if (clockwise) {
-        tap_code(KC_F5);
+        tap_code(KC_V);
       } else {
-        tap_code(KC_F7);
+        tap_code(KC_W);
       }
       break;
   }
