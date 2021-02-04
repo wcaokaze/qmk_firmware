@@ -40,10 +40,10 @@ enum custom_keycodes {
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_DVORAK] = LAYOUT(
-      KC_GRV , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   , KC_LSFT,     KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_SLSH, KC_BSLS,
-      KC_TAB , KC_QUOT, KC_COMM, KC_DOT , KC_P   , KC_Y   , KC_LSFT,     KC_F   , KC_G   , KC_C   , KC_R   , KC_L   , KC_MINS, KC_EQL ,
-      KC_LCTL, KC_A   , KC_O   , KC_E   , KC_U   , KC_I   , KC_KANA,     KC_D   , KC_H   , KC_T   , KC_N   , KC_S   , KC_LBRC, KC_RBRC,
-      KC_LSFT, KC_Z   , KC_Q   , KC_J   , KC_K   , KC_X   ,              KC_B   , KC_M   , KC_W   , KC_V   , KC_SCLN, S_ARW  , TG(_NUM),
+      KC_GRV , KC_1   , KC_2   , KC_3   , KC_4   , KC_5   , KC_LSFT,     KC_6   , KC_7   , KC_8   , KC_9   , KC_0   , KC_SLSH, XXXXXXX,
+      KC_TAB , KC_QUOT, KC_COMM, KC_DOT , KC_P   , KC_Y   , KC_LSFT,     KC_F   , KC_G   , KC_C   , KC_R   , KC_L   , KC_MINS, XXXXXXX,
+      KC_LCTL, KC_A   , KC_O   , KC_E   , KC_U   , KC_I   , KC_KANA,     KC_D   , KC_H   , KC_T   , KC_N   , KC_S   , KC_LBRC, XXXXXXX,
+      KC_LSFT, KC_Z   , KC_Q   , KC_J   , KC_K   , KC_X   ,              KC_B   , KC_M   , KC_W   , KC_V   , KC_SCLN, KC_EQL , TG(_NUM),
       MO(_FN)      , KC_LALT   , KC_SPC     , SYM_SPC     , ESC_SFT,     KC_BSPC, KC_ENT     , MO(_FN)     , KC_RGUI
   ),
 
@@ -65,9 +65,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_SYMBOL] = LAYOUT(
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______,     _______, S_ARW  , D_ARW  , _______, _______, KC_RBRC, _______,
       _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR , KC_PERC, _______,     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUES, _______,
-      _______, _______, _______, _______, _______, _______,              _______, _______, _______, _______, _______, D_ARW  , _______,
+      _______, _______, _______, _______, _______, _______,              _______, _______, _______, _______, _______, KC_BSLS, _______,
       _______      , _______   , _______    , _______     , _______,     KC_DEL , _______    , _______     , _______
   ),
 
