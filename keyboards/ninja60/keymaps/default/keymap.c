@@ -41,7 +41,12 @@ enum encoder_number {
 enum custom_keycodes {
    S_ARW = SAFE_RANGE,
    D_ARW,
-   UNDS_SPC
+   UNDS_SPC,
+   PLSASGN,
+   MNSASGN,
+   ASTASGN,
+   SLSASGN,
+   COMMENT
 };
 
 #define TG_SPC TG(_NORMAL_SPC)
@@ -75,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_SYMBOL] = LAYOUT(
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
-      _______, _______, _______, _______, _______, _______, _______,     KC_RBRC, S_ARW  , D_ARW  , _______, _______, KC_BSLS, _______,
+      _______, SLSASGN, ASTASGN, MNSASGN, PLSASGN, COMMENT, _______,     KC_RBRC, S_ARW  , D_ARW  , _______, _______, KC_BSLS, _______,
       _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR , KC_PERC, _______,     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, KC_QUES, _______,
       _______, _______, _______, _______, _______, _______,              _______, _______, _______, _______, _______, _______, _______,
       _______      , _______   , _______    , _______     , _______,     KC_DEL , _______    , _______     , _______
@@ -116,6 +121,31 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
 
             unds_spc_state = UNPRESSED;
+         }
+         return true;
+      case PLSASGN:
+         if (record->event.pressed) {
+            SEND_STRING(" += ");
+         }
+         return true;
+      case MNSASGN:
+         if (record->event.pressed) {
+            SEND_STRING(" -= ");
+         }
+         return true;
+      case ASTASGN:
+         if (record->event.pressed) {
+            SEND_STRING(" *= ");
+         }
+         return true;
+      case SLSASGN:
+         if (record->event.pressed) {
+            SEND_STRING(" /= ");
+         }
+         return true;
+      case COMMENT:
+         if (record->event.pressed) {
+            SEND_STRING(" /* ");
          }
          return true;
       default:
