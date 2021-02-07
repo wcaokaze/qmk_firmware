@@ -145,7 +145,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
          return true;
       case COMMENT:
          if (record->event.pressed) {
-            SEND_STRING(" /* ");
+            SEND_STRING("/*");
          }
          return true;
       default:
