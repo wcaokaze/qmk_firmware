@@ -16,6 +16,15 @@
 
 #include QMK_KEYBOARD_H
 
+enum key_state {
+   UNPRESSED,
+   PRESSED,
+   LONG_PRESSED
+};
+
+enum key_state unds_spc_state = UNPRESSED;
+uint16_t unds_spc_timer = 0;
+
 enum layer_names {
   _DVORAK = 0,
   _NORMAL_SPC,
@@ -31,7 +40,8 @@ enum encoder_number {
 
 enum custom_keycodes {
    S_ARW = SAFE_RANGE,
-   D_ARW
+   D_ARW,
+   UNDS_SPC
 };
 
 #define TG_SPC TG(_NORMAL_SPC)
@@ -44,7 +54,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_TAB , KC_QUOT, KC_COMM, KC_DOT , KC_P   , KC_Y   , KC_LSFT,     KC_F   , KC_G   , KC_C   , KC_R   , KC_L   , KC_MINS, XXXXXXX,
       KC_LCTL, KC_A   , KC_O   , KC_E   , KC_U   , KC_I   , KC_KANA,     KC_D   , KC_H   , KC_T   , KC_N   , KC_S   , KC_LBRC, XXXXXXX,
       KC_LSFT, KC_Z   , KC_Q   , KC_J   , KC_K   , KC_X   ,              KC_B   , KC_M   , KC_W   , KC_V   , KC_SCLN, KC_EQL , TG(_NUM),
-      MO(_FN)      , KC_LALT   , KC_SPC     , SYM_SPC     , ESC_SFT,     KC_BSPC, KC_ENT     , MO(_FN)     , KC_RGUI
+      MO(_FN)      , KC_LALT   , UNDS_SPC   , SYM_SPC     , ESC_SFT,     KC_BSPC, KC_ENT     , MO(_FN)     , KC_RGUI
   ),
 
   [_NORMAL_SPC] = LAYOUT(
@@ -92,8 +102,33 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             SEND_STRING("=>");
          }
          return true;
+      case UNDS_SPC:
+         if (record->event.pressed) {
+            unds_spc_state = PRESSED;
+            unds_spc_timer = timer_read();
+         } else {
+            if (unds_spc_state == LONG_PRESSED) {
+               unregister_code(KC_SPC);
+            } else {
+               register_code(KC_LSFT);
+               tap_code(KC_MINS);
+               unregister_code(KC_LSFT);
+            }
+
+            unds_spc_state = UNPRESSED;
+         }
+         return true;
       default:
          return true;
+   }
+}
+
+void matrix_scan_user(void) {
+   if (unds_spc_state == PRESSED) {
+      if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
+         unds_spc_state = LONG_PRESSED;
+         register_code(KC_SPC);
+      }
    }
 }
 
