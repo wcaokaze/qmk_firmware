@@ -22,6 +22,7 @@ enum key_state {
    LONG_PRESSED
 };
 
+bool lshift_is_pressed = false;
 enum key_state unds_spc_state = UNPRESSED;
 uint16_t unds_spc_timer = 0;
 
@@ -107,6 +108,10 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             SEND_STRING("=>");
          }
          return true;
+      case KC_LSFT:
+      case ESC_SFT:
+         lshift_is_pressed = record->event.pressed;
+         return true;
       case UNDS_SPC:
          if (record->event.pressed) {
             unds_spc_state = PRESSED;
@@ -115,9 +120,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (unds_spc_state == LONG_PRESSED) {
                unregister_code(KC_SPC);
             } else {
-               register_code(KC_LSFT);
-               tap_code(KC_MINS);
-               unregister_code(KC_LSFT);
+               if (lshift_is_pressed) {
+                  tap_code(KC_MINS);
+               } else {
+                  register_code(KC_LSFT);
+                  tap_code(KC_MINS);
+                  unregister_code(KC_LSFT);
+               }
             }
 
             unds_spc_state = UNPRESSED;
