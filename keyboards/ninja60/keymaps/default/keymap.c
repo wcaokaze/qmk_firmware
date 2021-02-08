@@ -19,6 +19,7 @@
 enum key_state {
    UNPRESSED,
    PRESSED,
+   TAPPED_ONCE,
    LONG_PRESSED
 };
 
@@ -96,7 +97,31 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
+void tap_underscore(void) {
+   if (lshift_is_pressed) {
+      tap_code(KC_MINS);
+   } else {
+      register_code(KC_LSFT);
+      tap_code(KC_MINS);
+      unregister_code(KC_LSFT);
+   }
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+   if (unds_spc_state == TAPPED_ONCE ||
+       unds_spc_state == PRESSED)
+   {
+      if (record->event.pressed) {
+         if (keycode == UNDS_SPC) {
+            tap_code(KC_ESC);
+            return true;
+         } else {
+            unds_spc_state = UNPRESSED;
+            tap_underscore();
+         }
+      }
+   }
+
    switch (keycode) {
       case S_ARW:
          if (record->event.pressed) {
@@ -117,20 +142,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             unds_spc_state = PRESSED;
             unds_spc_timer = timer_read();
          } else {
-            if (unds_spc_state == LONG_PRESSED) {
+            if (unds_spc_state == PRESSED) {
+               unds_spc_state = TAPPED_ONCE;
+               unds_spc_timer = timer_read();
+            } else if (unds_spc_state == LONG_PRESSED) {
                unregister_code(KC_SPC);
-            } else {
-               if (lshift_is_pressed) {
-                  tap_code(KC_MINS);
-               } else {
-                  register_code(KC_LSFT);
-                  tap_code(KC_MINS);
-                  unregister_code(KC_LSFT);
-               }
+               unds_spc_state = UNPRESSED;
             }
-
-            unds_spc_state = UNPRESSED;
          }
+
          return true;
       case PLSASGN:
          if (record->event.pressed) {
@@ -167,6 +187,11 @@ void matrix_scan_user(void) {
       if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
          unds_spc_state = LONG_PRESSED;
          register_code(KC_SPC);
+      }
+   } else if (unds_spc_state == TAPPED_ONCE) {
+      if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
+         unds_spc_state = UNPRESSED;
+         tap_underscore();
       }
    }
 }
