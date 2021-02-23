@@ -19,13 +19,18 @@
 enum key_state {
    UNPRESSED,
    PRESSED,
-   TAPPED_ONCE,
-   LONG_PRESSED
+   TAPPED_ONCE,        // released and tapping was input
+   LONG_PRESSED,
+   DOUBLE_PRESSED,     // pressed again after TAPPED_ONCE, before it becomes UNPRESSED
+   DOUBLE_LONG_PRESSED // holded after DOUBLE_PRESSED
 };
 
 bool lshift_is_pressed = false;
 enum key_state unds_spc_state = UNPRESSED;
 uint16_t unds_spc_timer = 0;
+
+enum key_state sym_spc_state = UNPRESSED;
+uint16_t sym_spc_timer = 0;
 
 enum layer_names {
   _DVORAK = 0,
@@ -43,6 +48,7 @@ enum encoder_number {
 enum custom_keycodes {
    S_ARW = SAFE_RANGE,
    D_ARW,
+   SYM_SPC,
    UNDS_SPC,
    PLSASGN,
    MNSASGN,
@@ -52,7 +58,6 @@ enum custom_keycodes {
 };
 
 #define TG_GAME TG(_GAMING)
-#define SYM_SPC LT(_SYMBOL, KC_SPC)
 #define ESC_SFT SFT_T(KC_ESC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -108,6 +113,16 @@ void tap_underscore(void) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+   if (sym_spc_state == PRESSED) {
+      if (record->event.pressed) {
+         sym_spc_state = LONG_PRESSED;
+      }
+   } else if (sym_spc_state == DOUBLE_PRESSED) {
+      if (record->event.pressed) {
+         sym_spc_state = DOUBLE_LONG_PRESSED;
+      }
+   }
+
    if (unds_spc_state == TAPPED_ONCE ||
        unds_spc_state == PRESSED)
    {
@@ -136,6 +151,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       case KC_LSFT:
       case ESC_SFT:
          lshift_is_pressed = record->event.pressed;
+         return true;
+      case SYM_SPC:
+         if (record->event.pressed) {
+            if (sym_spc_state == TAPPED_ONCE) {
+               sym_spc_state = DOUBLE_PRESSED;
+            } else {
+               sym_spc_state = PRESSED;
+            }
+
+            layer_on(_SYMBOL);
+            sym_spc_timer = timer_read();
+         } else {
+            if (sym_spc_state == PRESSED) {
+               layer_off(_SYMBOL);
+               tap_code(KC_SPC);
+            } else if (sym_spc_state == LONG_PRESSED) {
+               layer_off(_SYMBOL);
+            } else if (sym_spc_state == DOUBLE_PRESSED) {
+               layer_off(_SYMBOL);
+               tap_code(KC_SPC);
+            } else if (sym_spc_state == DOUBLE_LONG_PRESSED) {
+               sym_spc_state = TAPPED_ONCE;
+               unregister_code(KC_SPC);
+            }
+
+            sym_spc_state = TAPPED_ONCE;
+            sym_spc_timer = timer_read();
+         }
+
          return true;
       case UNDS_SPC:
          if (record->event.pressed) {
@@ -183,6 +227,22 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 }
 
 void matrix_scan_user(void) {
+   if (sym_spc_state == PRESSED) {
+      if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
+         sym_spc_state = LONG_PRESSED;
+      }
+   } else if (sym_spc_state == DOUBLE_PRESSED) {
+      if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
+         sym_spc_state = DOUBLE_LONG_PRESSED;
+         layer_off(_SYMBOL);
+         register_code(KC_SPC);
+      }
+   } else if (sym_spc_state == TAPPED_ONCE) {
+      if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
+         sym_spc_state = UNPRESSED;
+      }
+   }
+
    if (unds_spc_state == PRESSED) {
       if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
          unds_spc_state = LONG_PRESSED;
