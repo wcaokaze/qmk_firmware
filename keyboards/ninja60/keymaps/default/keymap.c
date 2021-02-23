@@ -44,7 +44,6 @@ enum encoder_number {
 enum custom_keycodes {
    S_ARW = SAFE_RANGE,
    D_ARW,
-   SYM_SPC,
    PLSASGN,
    MNSASGN,
    ASTASGN,
@@ -53,6 +52,7 @@ enum custom_keycodes {
 };
 
 #define TG_GAME TG(_GAMING)
+#define SYM_SPC LT(_SYMBOL, KC_SPC)
 #define ESC_SFT SFT_T(KC_ESC)
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -98,16 +98,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-   if (sym_spc_state == PRESSED) {
-      if (record->event.pressed) {
-         sym_spc_state = LONG_PRESSED;
-      }
-   } else if (sym_spc_state == DOUBLE_PRESSED) {
-      if (record->event.pressed) {
-         sym_spc_state = DOUBLE_LONG_PRESSED;
-      }
-   }
-
    switch (keycode) {
       case S_ARW:
          if (record->event.pressed) {
@@ -127,19 +117,9 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                sym_spc_state = PRESSED;
             }
 
-            layer_on(_SYMBOL);
             sym_spc_timer = timer_read();
          } else {
-            if (sym_spc_state == PRESSED) {
-               layer_off(_SYMBOL);
-               tap_code(KC_SPC);
-            } else if (sym_spc_state == LONG_PRESSED) {
-               layer_off(_SYMBOL);
-            } else if (sym_spc_state == DOUBLE_PRESSED) {
-               layer_off(_SYMBOL);
-               tap_code(KC_SPC);
-            } else if (sym_spc_state == DOUBLE_LONG_PRESSED) {
-               sym_spc_state = TAPPED_ONCE;
+            if (sym_spc_state == DOUBLE_LONG_PRESSED) {
                unregister_code(KC_SPC);
             }
 
@@ -186,11 +166,10 @@ void matrix_scan_user(void) {
    } else if (sym_spc_state == DOUBLE_PRESSED) {
       if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
          sym_spc_state = DOUBLE_LONG_PRESSED;
-         layer_off(_SYMBOL);
          register_code(KC_SPC);
       }
    } else if (sym_spc_state == TAPPED_ONCE) {
-      if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
+      if (timer_elapsed(sym_spc_timer) > TAPPING_TERM + 100) {
          sym_spc_state = UNPRESSED;
       }
    }
