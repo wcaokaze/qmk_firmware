@@ -29,7 +29,7 @@ uint16_t unds_spc_timer = 0;
 
 enum layer_names {
   _DVORAK = 0,
-  _NORMAL_SPC,
+  _GAMING,
   _NUM,
   _SYMBOL,
   _FN
@@ -51,7 +51,7 @@ enum custom_keycodes {
    COMMENT
 };
 
-#define TG_SPC TG(_NORMAL_SPC)
+#define TG_GAME TG(_GAMING)
 #define SYM_SPC LT(_SYMBOL, KC_SPC)
 #define ESC_SFT SFT_T(KC_ESC)
 
@@ -64,7 +64,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       MO(_FN)      , KC_LALT   , UNDS_SPC   , SYM_SPC     , KC_BSPC,     ESC_SFT, KC_ENT     , MO(_FN)     , KC_RGUI
   ),
 
-  [_NORMAL_SPC] = LAYOUT(
+  [_GAMING] = LAYOUT(
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, _______, _______, _______, _______, _______,
       _______, _______, _______, _______, _______, _______, KC_SPC ,     _______, _______, _______, _______, _______, _______, _______,
@@ -93,7 +93,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______, _______, _______, _______, _______,     _______, _______, KC_PSCR, _______, _______, _______, _______,
       _______, _______, _______, _______, _______, _______, _______,     KC_LEFT, KC_DOWN, KC_UP  , KC_RGHT, _______, _______, _______,
       _______, _______, _______, _______, _______, _______,              _______, KC_HOME, KC_END , _______, _______, D_ARW, _______,
-      _______      , _______   , _______    , KC_SPC      , TG_SPC ,     _______, _______    , _______     , _______
+      _______      , _______   , _______    , KC_SPC      , TG_GAME,     _______, _______    , _______     , _______
   )
 };
 
