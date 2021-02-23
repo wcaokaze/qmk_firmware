@@ -25,10 +25,6 @@ enum key_state {
    DOUBLE_LONG_PRESSED // holded after DOUBLE_PRESSED
 };
 
-bool lshift_is_pressed = false;
-enum key_state unds_spc_state = UNPRESSED;
-uint16_t unds_spc_timer = 0;
-
 enum key_state sym_spc_state = UNPRESSED;
 uint16_t sym_spc_timer = 0;
 
@@ -49,7 +45,6 @@ enum custom_keycodes {
    S_ARW = SAFE_RANGE,
    D_ARW,
    SYM_SPC,
-   UNDS_SPC,
    PLSASGN,
    MNSASGN,
    ASTASGN,
@@ -66,7 +61,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       KC_TAB , KC_QUOT, KC_COMM, KC_DOT , KC_P   , KC_Y   , KC_LSFT,     KC_F   , KC_G   , KC_C   , KC_R   , KC_L   , KC_EQL , XXXXXXX,
       KC_LCTL, KC_A   , KC_O   , KC_E   , KC_U   , KC_I   , KC_KANA,     KC_D   , KC_H   , KC_T   , KC_N   , KC_S   , KC_LBRC, XXXXXXX,
       KC_LSFT, KC_Z   , KC_Q   , KC_J   , KC_K   , KC_X   ,              KC_B   , KC_M   , KC_W   , KC_V   , KC_SCLN, KC_MINS, TG(_NUM),
-      MO(_FN)      , KC_LALT   , UNDS_SPC   , SYM_SPC     , KC_BSPC,     ESC_SFT, KC_ENT     , MO(_FN)     , KC_RGUI
+      MO(_FN)      , KC_LALT   , KC_UNDS    , SYM_SPC     , KC_BSPC,     ESC_SFT, KC_ENT     , MO(_FN)     , KC_RGUI
   ),
 
   [_GAMING] = LAYOUT(
@@ -102,16 +97,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   )
 };
 
-void tap_underscore(void) {
-   if (lshift_is_pressed) {
-      tap_code(KC_MINS);
-   } else {
-      register_code(KC_LSFT);
-      tap_code(KC_MINS);
-      unregister_code(KC_LSFT);
-   }
-}
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
    if (sym_spc_state == PRESSED) {
       if (record->event.pressed) {
@@ -120,20 +105,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
    } else if (sym_spc_state == DOUBLE_PRESSED) {
       if (record->event.pressed) {
          sym_spc_state = DOUBLE_LONG_PRESSED;
-      }
-   }
-
-   if (unds_spc_state == TAPPED_ONCE ||
-       unds_spc_state == PRESSED)
-   {
-      if (record->event.pressed) {
-         if (keycode == UNDS_SPC) {
-            tap_code(KC_ESC);
-            return true;
-         } else {
-            unds_spc_state = UNPRESSED;
-            tap_underscore();
-         }
       }
    }
 
@@ -147,10 +118,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
          if (record->event.pressed) {
             SEND_STRING("=>");
          }
-         return true;
-      case KC_LSFT:
-      case ESC_SFT:
-         lshift_is_pressed = record->event.pressed;
          return true;
       case SYM_SPC:
          if (record->event.pressed) {
@@ -178,21 +145,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
             sym_spc_state = TAPPED_ONCE;
             sym_spc_timer = timer_read();
-         }
-
-         return true;
-      case UNDS_SPC:
-         if (record->event.pressed) {
-            unds_spc_state = PRESSED;
-            unds_spc_timer = timer_read();
-         } else {
-            if (unds_spc_state == PRESSED) {
-               unds_spc_state = TAPPED_ONCE;
-               unds_spc_timer = timer_read();
-            } else if (unds_spc_state == LONG_PRESSED) {
-               unregister_code(KC_SPC);
-               unds_spc_state = UNPRESSED;
-            }
          }
 
          return true;
@@ -240,18 +192,6 @@ void matrix_scan_user(void) {
    } else if (sym_spc_state == TAPPED_ONCE) {
       if (timer_elapsed(sym_spc_timer) > TAPPING_TERM) {
          sym_spc_state = UNPRESSED;
-      }
-   }
-
-   if (unds_spc_state == PRESSED) {
-      if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
-         unds_spc_state = LONG_PRESSED;
-         register_code(KC_SPC);
-      }
-   } else if (unds_spc_state == TAPPED_ONCE) {
-      if (timer_elapsed(unds_spc_timer) > TAPPING_TERM) {
-         unds_spc_state = UNPRESSED;
-         tap_underscore();
       }
    }
 }
